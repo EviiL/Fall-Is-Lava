@@ -15,16 +15,15 @@ public class GameThread implements Runnable{
 
     private long sleepTime;
 
-    private long delay = 70;
+    private long delay = 10;
 
     private SurfaceHolder mSurfaceHolder;
     private Context mContext;
-    private Engine mEngine;
 
-    public GameThread(SurfaceHolder surfaceHolder, Context context, Engine engine){
-        mSurfaceHolder = surfaceHolder;
+    public GameThread(SurfaceHolder surfaceHolder, Context context){
         this.mContext = context;
-		mEngine = engine;
+        mSurfaceHolder = surfaceHolder;
+        mSurfaceHolder.setFormat(0x00000004);
     }
 
     @Override
@@ -36,7 +35,7 @@ public class GameThread implements Runnable{
 
             //Update Game.
 
-	        mEngine.update();
+	        Engine.getInstance().update();
 
             //Draw the Game.
             Canvas c = null;
@@ -44,7 +43,7 @@ public class GameThread implements Runnable{
                 c = mSurfaceHolder.lockCanvas(null);
 
                 synchronized (mSurfaceHolder){
-                    mEngine.draw(c);
+	                Engine.getInstance().draw(c);
                 }
             } finally {
                 if (c != null) {
@@ -61,5 +60,9 @@ public class GameThread implements Runnable{
                 e.printStackTrace();
             }
         }
+    }
+
+    public void setRunState(int runState){
+        this.runState = runState;
     }
 }

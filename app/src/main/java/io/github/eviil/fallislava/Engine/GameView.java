@@ -17,17 +17,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private GameThread thread;
 	private Handler handler;
 
-    private Engine engine;
+    private boolean threadPause = false;
 
-    public GameView(Context context, Engine engine) {
+
+    public GameView(Context context) {
         super(context);
-
         mContext = context;
         getHolder().addCallback(this);
-
         setFocusable(true);
 
-	    this.engine = engine;
 		HandlerThread handlerThread = new HandlerThread("");
 	    handlerThread.start();
 	    handler = new Handler(handlerThread.getLooper());
@@ -35,18 +33,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     }
 
+    public void pauseThread(){
+        threadPause = true;
+        thread.runState = GameThread.PAUSED;
+    }
+
+    public void resumeThread() {
+
+        if (threadPause) {
+            thread.runState = GameThread.RUNNING;
+            threadPause = false;
+        }
+    }
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event){
-		int action = event.getAction();
-		engine.notifyTouchEvent(event);
-
+		Engine.getInstance().notifyTouchEvent(event);
 		return true;
 	}
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-	    thread = new GameThread(getHolder(), mContext, this.engine);
+	    thread = new GameThread(getHolder(), mContext);
 	    handler.post(thread);
     }
 
